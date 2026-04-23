@@ -29,20 +29,27 @@ export default function App() {
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setFormStatus('submitting');
-    
-    // Simulate Netlify form submission
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    
-    try {
-      await fetch('/', {
-        method: 'POST',
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(formData as any).toString()
-      });
-      setFormStatus('success');
+  e.preventDefault();
+  setFormStatus('submitting');
+  
+  const form = e.currentTarget;
+  const formData = new FormData(form);
+  
+  // Create the URL encoded string with the required form-name
+  const searchParams = new URLSearchParams();
+  formData.forEach((value, key) => {
+    searchParams.append(key, value.toString());
+  });
+  // MANUALLY APPEND THE FORM NAME HERE
+  searchParams.append("form-name", "migration-interest");
+  
+  try {
+    await fetch('/', {
+      method: 'POST',
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: searchParams.toString()
+    });
+    setFormStatus('success');
       setTimeout(() => {
         setIsModalOpen(false);
         setFormStatus('idle');
